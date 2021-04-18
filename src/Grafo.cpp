@@ -1,13 +1,13 @@
-#include <Graph.h>
+#include <Grafo.h>
 
 using namespace std;
 
-Graph(){
+Grafo(){
 
 
 }
 
-~Graph(){
+~Grafo(){
 
-    
+
 }

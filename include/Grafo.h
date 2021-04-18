@@ -1,14 +1,14 @@
 using namespace std;
 
-class Graph {
+class Grafo {
     public:
-        Graph();
-        virtual ~Graph();
+        Grafo();
+        virtual ~Grafo();
 
 
     protected:
         int nVertices;
         int nArestas;
 
-        
+
 }
