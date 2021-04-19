@@ -1,3 +1,5 @@
+#include <string>
+
 using namespace std;
 
 class Grafo {
@@ -9,6 +11,7 @@ class Grafo {
     protected:
         int nVertices;
         int nArestas;
+        string savePath = "output";
 
 
-}
+};
