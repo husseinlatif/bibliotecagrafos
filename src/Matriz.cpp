@@ -1,11 +1,11 @@
-#include <Lista.h>
+#include <Matriz.h>
 #include <iostream>
 #include <string>
 #include <fstream>
 #include <sstream>
 using namespace std;
 
-Lista::Lista(string path){
+Matriz::Matriz(string path){
     ifstream myFile;
     myFile.open(path);
     if (!myFile){
@@ -16,9 +16,17 @@ Lista::Lista(string path){
     //Salva a primeira linha do arquivo (n de vertices)
     myFile >> nVertices;
 
-    /*Inicia o grafo, alocando memoria para a lista de ponteiro
-    iniciando a contegem de arestas e o vértice de graus com 0 */ 
-    m_plist = new Adjac*[nVertices+1]();
+    /*Inicia o grafo, criando uma matriz (ponteiros para arrays) e setando todos valores para false.
+    Nessa implementação as linhas não são contiguas na memória. */ 
+    arestas = new bool*[nVertices+1]();
+    for (int p = 0; p<nVertices+1; p++){
+        arestas[p] = new bool[nVertices+1];
+        for (int li = 0; li<nVertices+1; li++){
+            arestas[p][li] = false;
+        };  
+    };
+    
+    //Inicia o vertice de graus com 0.
     graus = new int[nVertices+1]();
     for (int j = 0; j < nVertices+1; ++j)
         {
@@ -41,7 +49,7 @@ Lista::Lista(string path){
     double grauMedio = 2.0*nArestas/nVertices;
     //salvando no output
     ofstream myInfoFile;
-    myInfoFile.open(m_savePath + "/info.txt");
+    myInfoFile.open(m_savePath + "/info_mat.txt");
     myInfoFile << "Vertices= " << nVertices << "  Arestas= " << nArestas << endl << "Grau medio = " << grauMedio;
     /* Salva o grau de cada vértice
     for (int k = 1; k < nVertices+1; ++k)
@@ -51,24 +59,12 @@ Lista::Lista(string path){
     */
 };
 
-void Lista::addAresta(int orig, int dest){
-    Adjac *no = new Adjac;
-    no->vertice = dest;
-    if(m_plist[orig] != NULL) m_plist[orig]->anterior = no;
-    no->proximo = m_plist[orig];
-    no->anterior = NULL;
-    this->m_plist[orig] = no;
+void Matriz::addAresta(int orig, int dest){
+    arestas[orig][dest] = true;
     graus[orig]++;
 };
 
-Lista::~Lista(){
-    Adjac *temp;
-    for (int i=1; i<=nVertices; i++){
-        for (Adjac *viz = m_plist[i]; viz!=NULL;){
-            temp = viz;
-            viz=viz->proximo;
-            delete temp;
-        };
-    };
-    delete[] m_plist;
+Matriz::~Matriz(){
+    for (int i=0; i<=nVertices+1; i++)delete arestas[i];
+    delete[] arestas;
 };

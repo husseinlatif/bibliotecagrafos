@@ -10,6 +10,7 @@ struct Adjac
 };
 
 
+
 class Lista : public Grafo{
 public:
     Lista(string path);
@@ -17,6 +18,7 @@ public:
 
 protected:
     Adjac **m_plist;
+    int *graus;
     void addAresta(int,int);
 
 };
