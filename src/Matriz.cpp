@@ -1,0 +1,116 @@
+#include <Matriz.h>
+#include <iostream>
+#include <string>
+#include <fstream>
+#include <sstream>
+#include <stack>
+using namespace std;
+
+Matriz::Matriz(string path){
+    ifstream inputFile;
+    inputFile.open(path);
+    if (!inputFile){
+        cout << "arquivo invalido";
+        return;
+    }
+    
+    //Salva a primeira linha do arquivo (n de vertices)
+    inputFile >> nVertices;
+
+    /*Inicia o grafo, criando uma matriz (ponteiros para arrays) e setando todos valores para false.
+    Nessa implementação as colunas não são contiguas na memória. 
+    Alocando n+1 para deixar mais simples (vertice 1 estara na posicao 1) e reserva posicao 0 para marcador*/ 
+    arestas = new bool*[nVertices+1]();
+    for (int p = 0; p<nVertices+1; p++){
+        arestas[p] = new bool[nVertices+1];
+        for (int li = 0; li<nVertices+1; li++){
+            arestas[p][li] = false;
+        };  
+    };
+    
+    //Inicia o vertice de graus com 0.
+    graus = new int[nVertices+1]();
+    for (int j = 0; j < nVertices+1; ++j)
+        {
+        graus[j] = 0;
+        };
+    nArestas = 0;
+
+    //Montando o grafo
+    string l;
+    while (getline(inputFile, l)){
+        if (l.empty() == false){
+            istringstream tmp(l);
+            int v1,v2;
+            tmp >> v1 >> v2;
+            this->addAresta(v1,v2);
+            this->addAresta(v2,v1);
+            nArestas++ ;
+        };
+    };
+    double grauMedio = 2.0*nArestas/nVertices;
+    //salvando no output
+    ofstream infomat;
+    infomat.open(m_savePath + "/info_mat.txt");
+    infomat << "Vertices= " << nVertices << "  Arestas= " << nArestas << endl << "Grau medio = " << grauMedio;
+    /* Salva o grau de cada vértice
+    for (int k = 1; k < nVertices+1; ++k)
+        {
+        myInfoFile << k << " tem grau: " << graus[k] << endl;
+        };
+    */
+};
+
+void Matriz::addAresta(int orig, int dest){
+    arestas[orig][dest] = true;
+    graus[orig]++;
+};
+
+void Matriz::DFS(int inic){
+    /*  
+    a posição 0 define se o vertice esta marcado ou nao,
+    necessario desmarcar vertices e zerar os pais e niveis para começar a busca; 
+    */    
+    
+    for (int i=0; i<this->nVertices+1;i++)this->arestas[0][i] = false;
+    pais = new int[nVertices+1]();
+    for (int i = 0; i < nVertices+1; ++i)pais[i] = 0;
+    nivel = new int[nVertices+1]();
+    for (int i = 0; i < nVertices+1; ++i)nivel[i] = 0;
+    stack<int> pilha;
+    
+    //comeco do dfs
+    pilha.push(inic);
+    int topo;
+    nivel[inic] = 0;
+    while(!pilha.empty()) {
+        topo = pilha.top();
+        pilha.pop();
+        // se o topo nao for descoberto, adiciona seus vizinhos na pilha
+        this->arestas[0][topo] = true;
+        // ordem inversa para que o topo seja o menor indice
+        for(int j=this->nVertices+1; j>0; j--){
+            if(this->arestas[topo][j] == true && this->arestas[0][j] == false){
+                pilha.push(j);
+                pais[j] = topo;
+                nivel[j] = nivel[topo] + 1;
+
+            };
+        };
+        
+    };
+    
+    //salvando infos em um txt compativel com csv
+    ofstream matdfs;
+    matdfs.open(m_savePath + "/dfs_mat.txt");
+    matdfs << "vertice,pai,nivel" << endl;
+    for(int p=1; p<this->nVertices+1; p++)matdfs << p << "," << pais[p] << "," << nivel[p] << endl;
+
+
+
+};
+
+Matriz::~Matriz(){
+    for (int i=0; i<=nVertices+1; i++)delete arestas[i];
+    delete[] arestas;
+};

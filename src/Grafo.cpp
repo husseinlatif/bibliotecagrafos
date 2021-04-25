@@ -2,12 +2,12 @@
 
 using namespace std;
 
-Grafo(){
+Grafo::Grafo(){
 
 
-}
+};
 
-~Grafo(){
+Grafo::~Grafo(){
 
 
-}
+};
