@@ -61,6 +61,15 @@ void Lista::addAresta(int orig, int dest){
     graus[orig]++;
 };
 
+void Lista::BFS(int inic){
+    //WIP
+    for (int i=0; i < this->nVertices+1; i++)this->arestas[0][i] = false;
+    pais = new int[nVertices+1]();
+    for (int i = 0; i < nVertices+1; ++i)pais[i] = 0;
+    nivel = new int[nVertices+1]();
+    for (int i = 0; i < nVertices+1; ++i)nivel[i] = 0;
+};
+
 Lista::~Lista(){
     Adjac *temp;
     for (int i=1; i<=nVertices; i++){
