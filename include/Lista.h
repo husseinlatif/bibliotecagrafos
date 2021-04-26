@@ -16,6 +16,7 @@ public:
     Lista(string path);
     ~Lista();
     void BFS(int inic);
+    void DFS(int raiz);
     int *pais, *nivel;
 
 protected:

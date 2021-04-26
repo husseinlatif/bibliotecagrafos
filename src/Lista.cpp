@@ -3,6 +3,7 @@
 #include <string>
 #include <fstream>
 #include <sstream>
+#include <stack>
 using namespace std;
 
 Lista::Lista(string path){
@@ -61,14 +62,18 @@ void Lista::addAresta(int orig, int dest){
     graus[orig]++;
 };
 
-void Lista::BFS(int inic){
-    //WIP
-    for (int i=0; i < this->nVertices+1; i++)this->arestas[0][i] = false;
-    pais = new int[nVertices+1]();
-    for (int i = 0; i < nVertices+1; ++i)pais[i] = 0;
-    nivel = new int[nVertices+1]();
-    for (int i = 0; i < nVertices+1; ++i)nivel[i] = 0;
-};
+// void Lista::BFS(int inic){
+//     //WIP
+//     for (int i=0; i < this->nVertices+1; i++)this->arestas[0][i] = false;
+//     pais = new int[nVertices+1]();
+//     for (int i = 0; i < nVertices+1; ++i)pais[i] = 0;
+//     nivel = new int[nVertices+1]();
+//     for (int i = 0; i < nVertices+1; ++i)nivel[i] = 0;
+// };
+
+void Lista::DFS(int raiz){
+
+}
 
 Lista::~Lista(){
     Adjac *temp;
