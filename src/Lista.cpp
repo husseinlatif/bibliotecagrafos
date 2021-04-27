@@ -4,6 +4,10 @@
 #include <fstream>
 #include <sstream>
 #include <queue>
+#include <iterator>
+#include <unordered_set>
+#include <vector>
+#include <utility>
 using namespace std;
 
 Lista::Lista(string path){
@@ -19,7 +23,7 @@ Lista::Lista(string path){
 
     /*Inicia o grafo, alocando memoria para a lista de ponteiro
     iniciando a contegem de arestas e o vértice de graus com 0 */ 
-    m_plist = new Adjac*[nVertices+1]();
+    m_plist = new Adjac*[nVertices+1]();;
     graus = new int[nVertices+1]();
     for (int j = 0; j < nVertices+1; ++j)
         {
@@ -44,20 +48,12 @@ Lista::Lista(string path){
     ofstream myInfoFile;
     myInfoFile.open(m_savePath + "/info.txt");
     myInfoFile << "Vertices= " << nVertices << "  Arestas= " << nArestas << endl << "Grau medio = " << grauMedio;
-    /* Salva o grau de cada vértice
-    for (int k = 1; k < nVertices+1; ++k)
-        {
-        myInfoFile << k << " tem grau: " << graus[k] << endl;
-        };
-    */
 };
 
 void Lista::addAresta(int orig, int dest){
     Adjac *no = new Adjac;
     no->vertice = dest;
-    if(m_plist[orig] != NULL) m_plist[orig]->anterior = no;
     no->proximo = m_plist[orig];
-    no->anterior = NULL;
     this->m_plist[orig] = no;
     graus[orig]++;
 };
@@ -91,7 +87,7 @@ void Lista::BFS(int inic){
         };
         fila.pop(); 
     };
-    pais[inic] = 0; //seta o pai da raiz como 0, para aderir convencoes  
+    pais[inic] = 0; //seta o pai da raiz como 0, para aderir convencoes 
     
     //Salva resultado em bfs_adjac.txt
     ofstream ladjbfs;
@@ -99,6 +95,64 @@ void Lista::BFS(int inic){
     ladjbfs << "vertice,pai,nivel" << endl;
     for(int p=1; p<this->nVertices+1; p++)ladjbfs << p << "," << pais[p] << "," << nivel[p] << endl;
 };
+
+void Lista::Conex(){
+    /* 
+    pair vec é um vetor que em pair_vec[n]:
+    .first é o contador de vertices na componente n
+    .second é uma fila com os vertices existentes em n
+    */   
+    vector<pair<int,queue<int>>>pair_vec;
+    unordered_set<int> dicio; //unordered_set, dicionario so com chave e nao ordenado   
+    for(int i=1 ; i < this->nVertices+1; i++)dicio.insert(i);
+    int conexId = 0;
+    while (!dicio.empty()){ //dicio armazena os nao visitados
+        queue<int> fila;
+        int inic = *dicio.begin(); //pega qualquer elemento do set (primeiro)
+        fila.push(inic); //inicia a fila com a raiz
+        Adjac *vert;
+        queue<int> complemento;
+        pair_vec.emplace_back(make_pair(0,complemento)); //inicia novo elemento com contador no 0 e nova lista
+        while (!fila.empty()){
+            vert = this->m_plist[fila.front()]; 
+            if(!vert){
+                //solucao naive para lidar com vertices sozinhos e raiz.   
+                pair_vec[conexId].second.push(fila.front()); //adiciona vertice sendo explorado no complemento
+                pair_vec[conexId].first++;
+                dicio.erase(fila.front());
+            };
+            fila.pop();
+            while (vert){                                      
+                //Realiza a bfs;
+                unordered_set<int>::iterator got = dicio.find(vert->vertice);
+                if ((got != dicio.end())){ // dicio.end aponta para depois do fim                         
+                    fila.push(vert->vertice);
+                    //adiciona vertice sendo explorado no complemento
+                    //incrementa o primeiro elemento (numero de vertices na componente)
+                    pair_vec[conexId].second.push(vert->vertice);
+                    pair_vec[conexId].first++; 
+                    //remove vert dos nao descobertos
+                    dicio.erase(got);
+                };               
+                vert=vert->proximo;
+                //Coloca o proximo vizinho para ser avaliado                    
+            };       
+        };
+        conexId++;    
+    };
+    for (int i = 0; i < pair_vec.size(); i++)
+    {
+        cout << endl << pair_vec[i].first<< endl;
+        while(!pair_vec[i].second.empty()){
+            cout << "vert = " << pair_vec[i].second.front() << " ";
+            pair_vec[i].second.pop();
+        };
+    };
+    
+        
+};
+
+
 
 Lista::~Lista(){
     Adjac *temp;

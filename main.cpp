@@ -6,6 +6,7 @@ using namespace std;
 
 int main(){
     Lista input = Lista("grafo_0.txt");
-    //Matriz inputmat = Matriz("grafo_1.txt");
-    input.BFS(1);
+    //Matriz inputmat = Matriz("grafo_0.txt");
+    //input.BFS(1000022);
+    input.Conex();
 };

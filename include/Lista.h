@@ -2,10 +2,12 @@
 #include <string>
 
 
+
+
 struct Adjac 
 {
     int vertice;
-    Adjac *proximo, *anterior;
+    Adjac *proximo;
 
 };
 
@@ -13,10 +15,11 @@ struct Adjac
 
 class Lista : public Grafo{
 public:
-    Lista(string path);
+    Lista(string);
     ~Lista();
-    void BFS(int inic);
+    void BFS(int);
     int *pais, *nivel;
+    void Conex();
 
 protected:
     Adjac **m_plist;
