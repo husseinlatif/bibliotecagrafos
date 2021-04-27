@@ -4,6 +4,7 @@
 #include <fstream>
 #include <sstream>
 #include <stack>
+#include <queue>
 using namespace std;
 
 Lista::Lista(string path){
@@ -62,18 +63,43 @@ void Lista::addAresta(int orig, int dest){
     graus[orig]++;
 };
 
-// void Lista::BFS(int inic){
-//     //WIP
-//     for (int i=0; i < this->nVertices+1; i++)this->arestas[0][i] = false;
-//     pais = new int[nVertices+1]();
-//     for (int i = 0; i < nVertices+1; ++i)pais[i] = 0;
-//     nivel = new int[nVertices+1]();
-//     for (int i = 0; i < nVertices+1; ++i)nivel[i] = 0;
-// };
-
-void Lista::DFS(int raiz){
-
-}
+void Lista::BFS(int inic){
+    //Inicia vetores de pais e niveis
+    pais = new int[this->nVertices+1]();
+    for (int i = 0; i < this->nVertices+1; ++i)pais[i] = 0;
+    nivel = new int[this->nVertices+1]();
+    for (int i = 0; i < this->nVertices+1; ++i)nivel[i] = 0;
+    queue<int> fila;
+    fila.push(inic); //inicia a fila com a raiz
+    pais[inic] = inic; // pai da raiz e ela propria para realizar o algoritmo
+    Adjac *vert;
+    while (!fila.empty()){
+        vert = this->m_plist[fila.front()];
+        while (vert){ //O ultimo vizinho na lista encadeada aponta para NULL.
+            /* O pai do vertice vai ser o menor entre os vertices pais presentes na camada que descobriu.
+               De resto, o algoritmo opera de maneira similiar ao mostrado na aula 5   */
+            if (nivel[vert->vertice] == nivel[fila.front()]+1)
+            {
+                pais[vert->vertice] = min(pais[vert->vertice],fila.front());
+            };
+            //Realiza a bfs
+            if (pais[vert->vertice] == 0){          
+                pais[vert->vertice] = fila.front();
+                nivel[vert->vertice] = nivel[fila.front()] + 1; 
+                fila.push(vert->vertice);     
+            };
+            vert=vert->proximo; //Coloca o proximo vizinho para ser avaliado        
+        };
+        fila.pop(); 
+    };
+    pais[inic] = 0; //seta o pai da raiz como 0, para aderir convencoes  
+    
+    //Salva resultado em bfs_adjac.txt
+    ofstream ladjbfs;
+    ladjbfs.open(m_savePath + "/bfs_adjac.txt");
+    ladjbfs << "vertice,pai,nivel" << endl;
+    for(int p=1; p<this->nVertices+1; p++)ladjbfs << p << "," << pais[p] << "," << nivel[p] << endl;
+};
 
 Lista::~Lista(){
     Adjac *temp;
