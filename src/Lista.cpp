@@ -101,6 +101,35 @@ void Lista::BFS(int inic){
     for(int p=1; p<this->nVertices+1; p++)ladjbfs << p << "," << pais[p] << "," << nivel[p] << endl;
 };
 
+void Lista::DFS(int raiz){
+    //Inicia vetores de pais, niveis e visitados:
+    pais = new int[this->nVertices+1]();
+    for (int i = 0; i < this->nVertices+1; ++i)pais[i] = 0;
+    nivel = new int[this->nVertices+1]();
+    for (int i = 0; i < this->nVertices+1; ++i)nivel[i] = 0;
+    bool visitados[nVertices+1];
+    for (int i = 0; i < this->nVertices+1; ++i)visitados[i] = false;
+    stack<int> pilha;
+
+    //Início da DFS - Insere a raiz na fila e define o seu nível como 0.
+    pilha.push(raiz);
+    nivel[raiz]=0;
+    Adjac *topo;
+    while (!pilha.empty()){
+        topo = this->m_plist[pilha.top()];
+        pilha.pop();
+        visitados[topo->vertice] = true;
+        
+        if(!visitados[topo->proximo->vertice]){
+            pilha.push(topo->proximo->vertice);
+            
+        }
+
+
+    }
+
+}
+
 Lista::~Lista(){
     Adjac *temp;
     for (int i=1; i<=nVertices; i++){
