@@ -9,6 +9,7 @@
 #include <unordered_set>
 #include <vector>
 #include <utility>
+#include <cstdlib>
 using namespace std;
 
 Lista::Lista(string path){
