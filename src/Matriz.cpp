@@ -54,12 +54,6 @@ Matriz::Matriz(string path){
     ofstream infomat;
     infomat.open(m_savePath + "/info_mat.txt");
     infomat << "Vertices= " << nVertices << "  Arestas= " << nArestas << endl << "Grau medio = " << grauMedio;
-    /* Salva o grau de cada vértice
-    for (int k = 1; k < nVertices+1; ++k)
-        {
-        myInfoFile << k << " tem grau: " << graus[k] << endl;
-        };
-    */
 };
 
 void Matriz::addAresta(int orig, int dest){

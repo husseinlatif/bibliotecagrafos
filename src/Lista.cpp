@@ -26,14 +26,7 @@ Lista::Lista(string path){
     /*Inicia o grafo, alocando memoria para a lista de ponteiro
     iniciando a contegem de arestas e o vértice de graus com 0 */ 
     m_plist = new Adjac*[nVertices+1]();;
-    /*graus = new int[nVertices+1]();
-    for (int j = 0; j < nVertices+1; ++j)
-        {
-        graus[j] = 0;
-        };
-    nArestas = 0;
-    */
-    
+
     //Montando o grafo
     string l;
     while (getline(myFile, l)){
@@ -155,7 +148,6 @@ void Lista::DFS(int raiz){
     int topo;
     while (!pilha.empty()){
         topo = pilha.top();
-        cout << topo << "TOPO" << endl;
         pilha.pop();
         
         //Define o próximo vizinho da lista ordenada
