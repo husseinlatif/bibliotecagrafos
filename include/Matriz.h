@@ -8,6 +8,7 @@ public:
     Matriz(string path);
     ~Matriz();
     void DFS(int inic);
+    void BFS(int raiz);
     int *pais, *nivel;
 
 protected:

@@ -4,6 +4,7 @@
 #include <fstream>
 #include <sstream>
 #include <stack>
+#include <queue>
 using namespace std;
 
 Matriz::Matriz(string path){
@@ -23,7 +24,7 @@ Matriz::Matriz(string path){
     arestas = new bool*[nVertices+1]();
     for (int p = 0; p<nVertices+1; p++){
         arestas[p] = new bool[nVertices+1];
-        for (int li = 0; li<nVertices+1; li++){
+        for (int li = 1; li<nVertices+1; li++){
             arestas[p][li] = false;
         };  
     };
@@ -96,19 +97,57 @@ void Matriz::DFS(int inic){
                 nivel[j] = nivel[topo] + 1;
 
             };
-        };
-        
+        };  
     };
-    
     //salvando infos em um txt compativel com csv
     ofstream matdfs;
     matdfs.open(m_savePath + "/dfs_mat.txt");
     matdfs << "vertice,pai,nivel" << endl;
     for(int p=1; p<this->nVertices+1; p++)matdfs << p << "," << pais[p] << "," << nivel[p] << endl;
-
-
-
 };
+
+
+    void Matriz::BFS(int raiz){
+    /*  
+    a posição 0 define se o vertice esta marcado ou nao,
+    necessario desmarcar vertices e zerar os pais e niveis para começar a busca; 
+    */    
+    for (int i=0; i<this->nVertices+1;i++)this->arestas[0][i] = false;
+    pais = new int[nVertices+1]();
+    for (int i = 0; i < nVertices+1; ++i)pais[i] = 0;
+    nivel = new int[nVertices+1]();
+    for (int i = 0; i < nVertices+1; ++i)nivel[i] = 0;
+    queue<int> fila;
+
+
+    //Início da BFS - Marca a raiz como descoberta e a insere na fila. Define o nível da raiz como 0.
+    this->arestas[0][raiz] = true;
+    fila.push(raiz);
+    nivel[raiz] = 0;
+    while (!fila.empty()) {
+        //Retira um vértice da fila:
+        int vertice = fila.front();
+        fila.pop();
+        //Percorre a matriz buscando pelos vizinhos do vértice
+        for (int i=1; i<nVertices+1; i++){
+            bool vizinho = arestas[vertice][i];
+            // Caso seja vizinho do vértice e não esteja marcado:
+            if (vizinho && !arestas[0][i]){
+                //Marca o vizinho como descoberto, define seu pai e o insere na fila. Define o nível do vizinho como o nível do pai + 1.
+                arestas[0][i] = true;
+                pais[i] = vertice;
+                nivel[i] = nivel[vertice] + 1;
+                fila.push(i);
+            };
+        };
+    };
+    ofstream matbfs;
+    matbfs.open(m_savePath + "/bfs_mat.txt");
+    matbfs << "vertice,pai,nivel" << endl;
+    for(int p=1; p<this->nVertices+1; p++)matbfs << p << "," << pais[p] << "," << nivel[p] << endl;
+};
+    
+
 
 Matriz::~Matriz(){
     for (int i=0; i<=nVertices+1; i++)delete arestas[i];
