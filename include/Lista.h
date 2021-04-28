@@ -1,7 +1,6 @@
 #include <Grafo.h>
 #include <string>
-
-
+#include <vector>
 
 
 struct Adjac 
@@ -21,10 +20,11 @@ public:
     void DFS(int raiz);
     int *pais, *nivel;
     void Conex();
+    int DIST(int, int);
+    int DIAM();
 
 protected:
     Adjac **m_plist;
-    int *graus;
     void addAresta(int,int);
 
 };
