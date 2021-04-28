@@ -107,24 +107,44 @@ void Lista::DFS(int raiz){
     for (int i = 0; i < this->nVertices+1; ++i)visitados[i] = false;
     stack<int> pilha;
 
-    //Início da DFS - Insere a raiz na fila e define o seu nível como 0.
+    //Início da DFS - Insere a raiz na pilha e define o seu nível como 0.
     pilha.push(raiz);
     nivel[raiz]=0;
-    Adjac *topo;
+    int topo;
     while (!pilha.empty()){
-        topo = this->m_plist[pilha.top()];
+        topo = pilha.top();
+        cout << topo << "TOPO" << endl;
         pilha.pop();
-        visitados[topo->vertice] = true;
         
-        if(!visitados[topo->proximo->vertice]){
-            pilha.push(topo->proximo->vertice);
-            
+        //Define o próximo vizinho da lista ordenada
+        Adjac *vizinho = this->m_plist[topo];
+
+        //Caso o vértice no topo da pilha não tenha sido visitado:
+        if(!visitados[topo]){
+            //Marca o vértice como visitado e define o pai e nível de seu vizinho
+            visitados[topo] = true;
+
+            //Percorre todos os vizinhos do vértice:
+            while(vizinho!=NULL){
+                
+                //Caso não seja um vértice visitado:
+                if(!visitados[vizinho->vertice]){
+                    //O insere na pilha.
+                    pilha.push(vizinho->vertice);
+                    pais[vizinho->vertice]=topo;
+                    nivel[vizinho->vertice]=nivel[topo]+1;
+                    
+                    }
+                vizinho = vizinho->proximo;
+            }
         }
-
-
     }
-
+    ofstream ladjdfs;
+    ladjdfs.open(m_savePath + "/dfs_adjac.txt");
+    ladjdfs << "vertice,pai,nivel" << endl;
+    for(int p=1; p<this->nVertices+1; p++)ladjdfs << p << "," << pais[p] << "," << nivel[p] << endl;
 }
+
 void Lista::Conex(){
     /* 
     pair vec é um vetor que em pair_vec[n]:
