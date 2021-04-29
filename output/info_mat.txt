@@ -1,2 +1,0 @@
-Vertices= 100054  Arestas= 3433247
-Grau medio = 68.6279

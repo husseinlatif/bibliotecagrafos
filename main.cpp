@@ -1,15 +1,17 @@
 #include <iostream>
 #include <Lista.h>
 #include <Matriz.h>
+#include <Timer.h>
+#include <stdlib.h>
 
 using namespace std;
 
 int main(){
-    Lista input = Lista("grafo_6.txt");
+    Lista input1 = Lista("grafo_4.txt");
     Matriz inputmat = Matriz("grafo_4.txt");
     inputmat.DFS(2);
     inputmat.BFS(2);
-    input.Conex();
-    input.BFS(2);
-    input.DFS(2);
+    input1.Conex();
+    input1.BFS(2);
+    input1.DFS(2);
 };

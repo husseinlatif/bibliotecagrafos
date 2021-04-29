@@ -1,2 +1,0 @@
-Vertices= 1000022  Arestas= 17666652
-Grau medio = 35.3325   Grau maximo = 87
