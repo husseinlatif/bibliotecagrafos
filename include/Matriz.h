@@ -8,10 +8,13 @@ public:
     Matriz(string path);
     ~Matriz();
     void DFS(int inic);
+    void BFS(int raiz);
     int *pais, *nivel;
+    int  DIST(int, int);
+    int DIAM();
+    void Conex();
 
 protected:
     bool **arestas;
-    int *graus;
     void addAresta(int,int);
 };
