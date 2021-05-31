@@ -217,6 +217,74 @@ void Lista::DijDist(int inic, int fim){
     for(int p=1; p<this->nVertices+1; p++)DijDist << p << "," << dists[p] << endl;
 };
 
+void Lista::GenerateMST(int origem){
+    double inf = std::numeric_limits<double>::infinity();
+
+    //Implementação do Algoritmo de Prim.
+    //Declara uma fila de prioridade para os custos.
+    priority_queue < pair<double, int>, vector<pair<double, int> >, greater<pair<double, int> > > fila_p;
+    fila_p.push(make_pair(0.0, origem));
+
+    //Declara a MST a ser gerada.
+    WAdjac **MST[nVertices+1];
+
+    //Declara array para os custos e array de pais.
+    double *custo;
+    custo = new double[nVertices+1];
+    pais = new int[nVertices+1];
+    for (int i = 0; i < nVertices+1; ++i){
+        custo[i] = inf;
+        pais[i] = 0;
+    }
+    custo[origem] = 0;
+
+    //Variável para controlar o número de arestas da MST. Quando atingir n-1 arestas (número de arestas de uma MST é nvertices-1), interrompe o código.
+    int arestas;
+    arestas = 0;
+
+    while (arestas <= this->nVertices-1){
+        pair<double,int> topo = fila_p.top();
+        int vert_indice = topo.second;
+        fila_p.pop();
+        WAdjac *vert;
+        vert = w_list[vert_indice];
+        arestas++;
+        while (vert){
+            int vizinho;
+            vizinho = vert->proximo->vertice;
+            if (custo[vizinho] > vert->peso){
+                custo[vizinho] = vert->peso;
+                pais[vizinho] = vert_indice;
+                fila_p.push(make_pair(vert->peso,vizinho));
+            }
+            vert=vert->proximo;
+        }
+
+    }
+
+    ofstream MSTree;
+    MSTree.open(m_savePath + "/MST.txt");
+    MSTree << "vertice, vertice, peso" << endl;
+    for(int p=1; p<this->nVertices+1; p++)MSTree << p << "," << pais[p] << "," << custo[p] << endl;
+
+
+
+
+    //Para cada vértice do grafo, insere suas arestas (com a informação de peso e vizinho) em uma fila de prioridade.
+    /*for (int i = 1; i < this->nVertices+1; ++i) {
+        WAdjac *nextEdge;
+        nextEdge = w_list[i];
+        while (nextEdge->proximo!=NULL){
+            fila_p.push(make_pair(w_list[i]->peso, w_list[i]->vertice));
+            }
+        }
+    WAdjac **MSTlist;
+    MSTlist = new WAdjac*[nVertices+1];
+    while (!fila_p.empty()){
+        
+    }*/
+}
+
 
 int Lista::DIAM(){
     int maxim = 0;

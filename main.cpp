@@ -7,5 +7,5 @@ using namespace std;
 
 int main(){
     Lista input = Lista("test.txt");
-    input.DijDist(1,3);
+    input.GenerateMST(2);
 };
