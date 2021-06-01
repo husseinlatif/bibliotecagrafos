@@ -7,5 +7,6 @@ using namespace std;
 
 int main(){
     Lista input = Lista("test.txt");
-    input.GenerateMST(2);
+    input.GenerateDij(2);
+    input.Excentricidade();
 };
