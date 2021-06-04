@@ -225,67 +225,58 @@ void Lista::GenerateMST(int origem){
     priority_queue < pair<double, int>, vector<pair<double, int> >, greater<pair<double, int> > > fila_p;
     fila_p.push(make_pair(0.0, origem));
 
-    //Declara a MST a ser gerada.
-
-    //Declara array para os custos e array de pais.
-    double *custo;
-    custo = new double[nVertices+1];
+    //Declara array para os custos, array de pais, e array de visitados.
+    dists = new double[nVertices+1];
     pais = new int[nVertices+1];
+    visitados = new bool[nVertices+1];
+
+    //Percorre os arrays setando os valores iniciais.
     for (int i = 0; i < nVertices+1; ++i){
-        custo[i] = inf;
+        dists[i] = inf;
         pais[i] = 0;
+        visitados[i] = false;
     }
-    custo[origem] = 0;
 
-    //Variável para controlar o número de arestas da MST. Quando atingir n-1 arestas (número de arestas de uma MST é nvertices-1), interrompe o código.
-    int arestas;
-    arestas = 0;
+    //O custo para chegar à origem é zero.
+    dists[origem] = 0;
 
-    while (arestas <= this->nVertices-1){
-        pair<double,int> topo = fila_p.top();
-        int vert_indice = topo.second;
+    //Declaração de variáveis utilizadas dentro do while.
+    pair<double,int> topo;
+    int vert_indice;
+    int vizinho_ind;
+    WAdjac *vizinho;
+
+    //Enquanto a priority queue não estiver vazia:
+    while (!fila_p.empty()){
+        //Seleciona o vértice de maior prioridade (com menor custo e não visitado):
+        topo = fila_p.top();
+        //Armazena seu índice:
+        vert_indice = topo.second;
+        //Marca o vértice como visitado:
+        visitados[vert_indice] = true;
+        //O remove da priority queue:
         fila_p.pop();
-        WAdjac *vert;
-        vert = w_list[vert_indice];
-        arestas++;
-        while (vert != NULL){
-            int vizinho;
-            vizinho = vert->proximo->vertice;
-            if (custo[vizinho] > vert->peso){
-                custo[vizinho] = vert->peso;
-                pais[vizinho] = vert_indice;
-                fila_p.push(make_pair(vert->peso,vizinho));
-            }
-            vert=vert->proximo;
-        }
-    }
-
-    for (int p=0;p<this->nVertices+1;p++){
-        cout << pais[p] << endl;
-    }
+        //Seleciona seu vizinho:
+        vizinho = w_list[vert_indice];
+        //Enquanto não percorrer todos os vizinhos do vértice de maior prioridade:
+        while (vizinho != NULL){
+            vizinho_ind = vizinho->vertice;
+            //Apenas executa a verificação e a inserção na fila de prioridade caso o vizinho não seja visitado e seu custo seja maior:
+            if (dists[vizinho_ind] > vizinho->peso && visitados[vizinho_ind] == false){
+                dists[vizinho_ind] = vizinho->peso;
+                pais[vizinho_ind] = vert_indice;
+                fila_p.push(make_pair(dists[vizinho_ind],vizinho_ind));
+                };
+            //Passa para o próximo vizinho:
+            vizinho = vizinho->proximo;
+        };
+    };
 
     ofstream MSTree;
     MSTree.open(m_savePath + "/MST.txt");
-    MSTree << "vertice, vertice, peso" << endl;
-    for(int p=1; p<this->nVertices+1; p++)MSTree << p << "," << pais[p] << "," << custo[p] << endl;
-
-
+    MSTree << "vertice, pai, peso" << endl;
+    for(int p=1; p<this->nVertices+1; p++)MSTree << p << ", " << pais[p] << ", " << dists[p] << endl;
 };
-
-    //Para cada vértice do grafo, insere suas arestas (com a informação de peso e vizinho) em uma fila de prioridade.
-    /*for (int i = 1; i < this->nVertices+1; ++i) {
-        WAdjac *nextEdge;
-        nextEdge = w_list[i];
-        while (nextEdge->proximo!=NULL){
-            fila_p.push(make_pair(w_list[i]->peso, w_list[i]->vertice));
-            }
-        }
-    WAdjac **MSTlist;
-    MSTlist = new WAdjac*[nVertices+1];
-    while (!fila_p.empty()){
-        
-    }*/
-
 
 
 int Lista::DIAM(){
