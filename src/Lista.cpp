@@ -226,7 +226,6 @@ void Lista::GenerateMST(int origem){
     fila_p.push(make_pair(0.0, origem));
 
     //Declara a MST a ser gerada.
-    WAdjac **MST[nVertices+1];
 
     //Declara array para os custos e array de pais.
     double *custo;
@@ -249,7 +248,7 @@ void Lista::GenerateMST(int origem){
         WAdjac *vert;
         vert = w_list[vert_indice];
         arestas++;
-        while (vert){
+        while (vert != NULL){
             int vizinho;
             vizinho = vert->proximo->vertice;
             if (custo[vizinho] > vert->peso){
@@ -259,7 +258,10 @@ void Lista::GenerateMST(int origem){
             }
             vert=vert->proximo;
         }
+    }
 
+    for (int p=0;p<this->nVertices+1;p++){
+        cout << pais[p] << endl;
     }
 
     ofstream MSTree;
@@ -268,7 +270,7 @@ void Lista::GenerateMST(int origem){
     for(int p=1; p<this->nVertices+1; p++)MSTree << p << "," << pais[p] << "," << custo[p] << endl;
 
 
-
+};
 
     //Para cada vértice do grafo, insere suas arestas (com a informação de peso e vizinho) em uma fila de prioridade.
     /*for (int i = 1; i < this->nVertices+1; ++i) {
@@ -283,7 +285,7 @@ void Lista::GenerateMST(int origem){
     while (!fila_p.empty()){
         
     }*/
-}
+
 
 
 int Lista::DIAM(){
