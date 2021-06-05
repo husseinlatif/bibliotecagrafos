@@ -91,6 +91,7 @@ void Lista::addAresta(int orig, int dest){
 };
 
 void Lista::addWAresta(int orig, int dest, double peso){
+    //Add aresta com pesos
     WAdjac *no = new WAdjac;
     no->vertice = dest;
     no->proximo = w_list[orig];
@@ -163,28 +164,40 @@ int Lista::DIST(int inic, int fim){
     return -1;
 };
 
-void Lista::DijDist(int inic, int fim){
+void Lista::GenerateDij(int inic){
+    if(this->tem_pesonegativo){ //checa se tem negativo
+        cout << "possui pesos negativos";
+        return;
+    };
+
     double inf = std::numeric_limits<double>::infinity();
     int nv = this->nVertices+1;
-    dists = new double[nv];
-    visitados = new bool[nv];
-    pais = new int[nv];
+    dists = new double[nv]; //custo mais recente para determinado vertice
+    visitados = new bool[nv]; //true se visitado
+    pais = new int[nv]; //pais de cada vertice
     for (int i = 0; i < nv; ++i){
+        //incializa com valores apropriados
         dists[i] = inf;
         visitados[i] = false;
         pais[i] = 0;
     };
     dists[inic] = 0.0;
+    //fila de prioridade, <peso,vertice>, o topo é sempre o menor custo.
     priority_queue < pair<double, int>, vector<pair<double, int> >, greater<pair<double, int> > > fila_p;
-    fila_p.push(make_pair(0.0, inic));
+    fila_p.push(make_pair(0.0, inic)); //coloca a raiz com custo zero
 
+
+    pair<double,int> dupl;
+    int vert_indice;
+    WAdjac *vert;
+    //Realiza a busca
     while (!fila_p.empty())
     {
-        pair<double,int> dupl = fila_p.top();
-        int vert_indice = dupl.second;
-        fila_p.pop();
-        WAdjac *vert;
-        if(visitados[vert_indice] == false){
+        dupl = fila_p.top(); //pega o elemento do vértice pai
+        vert_indice = dupl.second; //pega o vértice pai
+        fila_p.pop(); //remove o topo
+
+        if(visitados[vert_indice] == false){//controle de visitados
             visitados[vert_indice] = true;
             vert = this->w_list[vert_indice];
             while (vert)
@@ -198,23 +211,40 @@ void Lista::DijDist(int inic, int fim){
                     pais[viz_indice] = vert_indice;
                     fila_p.push(make_pair(dists[viz_indice],viz_indice));
                 };
-                vert = vert->proximo;
+                vert = vert->proximo; //iterando os vizinhos
             };
         };
     };
-    int cam = pais[fim];
-    cout << fim << endl;
-    while (cam != inic)
-    {
-        cout << cam << endl;
-        cam = pais[cam];
-
-    };
-    cout << inic <<endl;
+    //salva no arquivo ./output/Dists_Dij.txt
     ofstream DijDist;
     DijDist.open(m_savePath + "/Dists_Dij.txt");
     DijDist << "vertice, Distancia de vertice " << inic << endl;
     for(int p=1; p<this->nVertices+1; p++)DijDist << p << "," << dists[p] << endl;
+};
+
+void Lista::DijDist(int inic, int fim){
+    //Printa a distancia e o caminho de inic ate fim, necessario informar o inic == raiz do Dij
+    cout << "dist de " << inic << " a " << fim << " = " << this->dists[fim] << " / ";
+    int cam = pais[fim];
+    cout << fim << ", ";
+    if(inic == fim)return;
+    while (cam != inic)
+    {
+        cout << cam << ", ";
+        cam = pais[cam];
+    };
+    cout << inic <<endl;
+};
+
+void Lista::Excentricidade(){
+    //Printa a excentricidade
+    double max = this->dists[1];
+    for (int i = 1; i < this->nVertices; i++)
+    {  
+        double temp = this->dists[i];
+        if(temp > max)max=temp;
+    };
+    cout << max << endl;
 };
 
 void Lista::GenerateMST(int origem){
@@ -283,7 +313,7 @@ void Lista::GenerateMST(int origem){
     while (!fila_p.empty()){
         
     }*/
-}
+};
 
 
 int Lista::DIAM(){
