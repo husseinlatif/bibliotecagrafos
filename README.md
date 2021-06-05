@@ -53,7 +53,7 @@ Tendo em vista o formato acima, basta declarar o componente (em main.cpp) de nos
 
     };
     
-Temos disponíveis as seguintes funções em cada implementação:
+Temos disponíveis as seguintes funções em cada implementação. Ao executá-las, os resultados serão salvos em uma pasta 'output', no diretório raiz do repositório:
 
 # Representação por Matrizes de Adjacência:
 
