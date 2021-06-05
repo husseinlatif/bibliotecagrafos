@@ -32,7 +32,9 @@ public:
     int DIST(int, int);
     int DIAM();
     void DijDist(int,int);
+    void GenerateDij(int);
     void GenerateMST(int);
+    void Excentricidade();
     bool *visitados;
     bool tem_peso;
     bool tem_pesonegativo;
