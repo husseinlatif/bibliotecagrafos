@@ -82,7 +82,9 @@ Temos disponíveis as seguintes funções em cada implementação. Ao executá-l
 
 * GenerateMST(int x): Retorna a MST com raiz no vértice x para seu grafo.
 
-* GenerateDij(int x): Cria um vetor contendo a distância de x(raiz) para todos os outros vértices. Serve de suporte para o cálculo de excentricidade e distância.
+* GenerateDij(int x): Cria um vetor contendo a distância de x(raiz) para todos os outros vértices (Dijkstra). Serve de suporte para o cálculo de excentricidade e distância.
 
-* 
+* DijDist(int x, int y): Função método que retorna a distância e o caminho mínimo entre os vértices x e y após ter sido criado a GenerateDij(int x).
+
+* Excentricidade(): Função método que a excentricidade do vértice x, após ter sido criado a GenerateDij(int x).
       
