@@ -302,8 +302,17 @@ void Lista::GenerateMST(int origem){
         };
     };
 
+    //Cálculo do custo da MST:
+    double cost;
+    cost = 0;
+    for (int i=1; i<this->nVertices+1; i++){
+        cost += dists[i];
+    };
+
+
     ofstream MSTree;
     MSTree.open(m_savePath + "/MST.txt");
+    MSTree << "CUSTO DA MST " << cost << endl;
     MSTree << "vertice, pai, peso" << endl;
     for(int p=1; p<this->nVertices+1; p++)MSTree << p << ", " << pais[p] << ", " << dists[p] << endl;
 };
