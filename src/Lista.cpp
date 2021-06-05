@@ -11,6 +11,7 @@
 #include <utility>
 #include <cstdlib>
 #include <algorithm>
+#include <limits>
 using namespace std;
 
 Lista::Lista(string path){
@@ -23,24 +24,57 @@ Lista::Lista(string path){
     //Salva a primeira linha do arquivo (n de vertices)
     myFile >> nVertices;
     vector<int> graos(nVertices+1);
-    /*Inicia o grafo, alocando memoria para a lista de ponteiro
-    iniciando a contegem de arestas e o vértice de graus com 0 */ 
-    m_plist = new Adjac*[nVertices+1]();;
-
+    
     //Montando o grafo
     string l;
-    while (getline(myFile, l)){
-        if (l.empty() == false){
-            istringstream tmp(l);
-            int v1,v2;
-            tmp >> v1 >> v2;
-            this->addAresta(v1,v2);
-            this->addAresta(v2,v1);
-            graos[v1]++;
-            graos[v2]++;
-            nArestas++;
+    getline(myFile, l); //Removendo o endl que ficou após a leitura do nvertice
+    getline(myFile, l); //Pegar a primeira linha para ver se é com peso
+    istringstream tmp(l);
+    int v1,v2;
+    double v3 = std::numeric_limits<double>::max(); //Valor de inf
+    tmp >> v1 >> v2;
+    tmp >> v3;
+
+    this->tem_peso = false;
+    this->tem_pesonegativo = false;
+
+    if (v3 == std::numeric_limits<double>::max())
+    {
+        //aloca espaço para estrutras sem peso
+        m_plist = new Adjac*[nVertices+1]();;
+        this->addAresta(v1,v2);
+        this->addAresta(v2,v1);
+        while (getline(myFile, l)){
+            if (l.empty() == false){
+                istringstream tmp(l);
+                tmp >> v1 >> v2;
+                this->addAresta(v1,v2);
+                this->addAresta(v2,v1);
+                graos[v1]++;
+                graos[v2]++;
+                nArestas++;
+            };
+        };
+    } else {
+        //pesados
+        w_list = new WAdjac*[nVertices+1]();;
+        this->tem_peso = true;
+        this->addWAresta(v1,v2,v3);
+        this->addWAresta(v2,v1,v3);
+        while (getline(myFile, l)){
+            if (l.empty() == false){
+                istringstream tmp(l);
+                tmp >> v1 >> v2 >> v3;
+                if(v3 < 0)this->tem_pesonegativo = true; //flag de peso negativo
+                this->addWAresta(v1,v2,v3);
+                this->addWAresta(v2,v1,v3);
+                graos[v1]++;
+                graos[v2]++;
+                nArestas++;
+            };
         };
     };
+
     double grauMedio = 2.0*nArestas/nVertices;
     sort(graos.begin(), graos.end());
     //salvando no output
@@ -54,6 +88,15 @@ void Lista::addAresta(int orig, int dest){
     no->vertice = dest;
     no->proximo = m_plist[orig];
     this->m_plist[orig] = no;
+};
+
+void Lista::addWAresta(int orig, int dest, double peso){
+    //Add aresta com pesos
+    WAdjac *no = new WAdjac;
+    no->vertice = dest;
+    no->proximo = w_list[orig];
+    no->peso = peso;
+    this->w_list[orig] = no;
 };
 
 void Lista::BFS(int inic){
@@ -121,6 +164,150 @@ int Lista::DIST(int inic, int fim){
     return -1;
 };
 
+void Lista::GenerateDij(int inic){
+    if(this->tem_pesonegativo){ //checa se tem negativo
+        cout << "possui pesos negativos";
+        return;
+    };
+
+    double inf = std::numeric_limits<double>::infinity();
+    int nv = this->nVertices+1;
+    dists = new double[nv]; //custo mais recente para determinado vertice
+    visitados = new bool[nv]; //true se visitado
+    pais = new int[nv]; //pais de cada vertice
+    for (int i = 0; i < nv; ++i){
+        //incializa com valores apropriados
+        dists[i] = inf;
+        visitados[i] = false;
+        pais[i] = 0;
+    };
+    dists[inic] = 0.0;
+    //fila de prioridade, <peso,vertice>, o topo é sempre o menor custo.
+    priority_queue < pair<double, int>, vector<pair<double, int> >, greater<pair<double, int> > > fila_p;
+    fila_p.push(make_pair(0.0, inic)); //coloca a raiz com custo zero
+
+
+    pair<double,int> dupl;
+    int vert_indice;
+    WAdjac *vert;
+    //Realiza a busca
+    while (!fila_p.empty())
+    {
+        dupl = fila_p.top(); //pega o elemento do vértice pai
+        vert_indice = dupl.second; //pega o vértice pai
+        fila_p.pop(); //remove o topo
+
+        if(visitados[vert_indice] == false){//controle de visitados
+            visitados[vert_indice] = true;
+            vert = this->w_list[vert_indice];
+            while (vert)
+            {
+                int viz_indice = vert->vertice;
+                double peso_a = vert->peso;
+
+                if (dists[viz_indice] > dists[vert_indice] + peso_a)
+                {
+                    dists[viz_indice] = dists[vert_indice] + peso_a;
+                    pais[viz_indice] = vert_indice;
+                    fila_p.push(make_pair(dists[viz_indice],viz_indice));
+                };
+                vert = vert->proximo; //iterando os vizinhos
+            };
+        };
+    };
+    //salva no arquivo ./output/Dists_Dij.txt
+    ofstream DijDist;
+    DijDist.open(m_savePath + "/Dists_Dij.txt");
+    DijDist << "vertice, Distancia de vertice " << inic << endl;
+    for(int p=1; p<this->nVertices+1; p++)DijDist << p << "," << dists[p] << endl;
+};
+
+void Lista::DijDist(int inic, int fim){
+    //Printa a distancia e o caminho de inic ate fim, necessario informar o inic == raiz do Dij
+    cout << "dist de " << inic << " a " << fim << " = " << this->dists[fim] << " / ";
+    int cam = pais[fim];
+    cout << fim << ", ";
+    if(inic == fim)return;
+    while (cam != inic)
+    {
+        cout << cam << ", ";
+        cam = pais[cam];
+    };
+    cout << inic <<endl;
+};
+
+void Lista::Excentricidade(){
+    //Printa a excentricidade
+    double max = this->dists[1];
+    for (int i = 1; i < this->nVertices; i++)
+    {  
+        double temp = this->dists[i];
+        if(temp > max)max=temp;
+    };
+    cout << max << endl;
+};
+
+void Lista::GenerateMST(int origem){
+    double inf = std::numeric_limits<double>::infinity();
+
+    //Implementação do Algoritmo de Prim.
+    //Declara uma fila de prioridade para os custos.
+    priority_queue < pair<double, int>, vector<pair<double, int> >, greater<pair<double, int> > > fila_p;
+    fila_p.push(make_pair(0.0, origem));
+
+    //Declara array para os custos, array de pais, e array de visitados.
+    dists = new double[nVertices+1];
+    pais = new int[nVertices+1];
+    visitados = new bool[nVertices+1];
+
+    //Percorre os arrays setando os valores iniciais.
+    for (int i = 0; i < nVertices+1; ++i){
+        dists[i] = inf;
+        pais[i] = 0;
+        visitados[i] = false;
+    }
+
+    //O custo para chegar à origem é zero.
+    dists[origem] = 0;
+
+    //Declaração de variáveis utilizadas dentro do while.
+    pair<double,int> topo;
+    int vert_indice;
+    int vizinho_ind;
+    WAdjac *vizinho;
+
+    //Enquanto a priority queue não estiver vazia:
+    while (!fila_p.empty()){
+        //Seleciona o vértice de maior prioridade (com menor custo e não visitado):
+        topo = fila_p.top();
+        //Armazena seu índice:
+        vert_indice = topo.second;
+        //Marca o vértice como visitado:
+        visitados[vert_indice] = true;
+        //O remove da priority queue:
+        fila_p.pop();
+        //Seleciona seu vizinho:
+        vizinho = w_list[vert_indice];
+        //Enquanto não percorrer todos os vizinhos do vértice de maior prioridade:
+        while (vizinho != NULL){
+            vizinho_ind = vizinho->vertice;
+            //Apenas executa a verificação e a inserção na fila de prioridade caso o vizinho não seja visitado e seu custo seja maior:
+            if (dists[vizinho_ind] > vizinho->peso && visitados[vizinho_ind] == false){
+                dists[vizinho_ind] = vizinho->peso;
+                pais[vizinho_ind] = vert_indice;
+                fila_p.push(make_pair(dists[vizinho_ind],vizinho_ind));
+                };
+            //Passa para o próximo vizinho:
+            vizinho = vizinho->proximo;
+        };
+    };
+
+    ofstream MSTree;
+    MSTree.open(m_savePath + "/MST.txt");
+    MSTree << "vertice, pai, peso" << endl;
+    for(int p=1; p<this->nVertices+1; p++)MSTree << p << ", " << pais[p] << ", " << dists[p] << endl;
+};
+
 
 int Lista::DIAM(){
     int maxim = 0;
@@ -138,7 +325,7 @@ void Lista::DFS(int raiz){
     for (int i = 0; i < this->nVertices+1; ++i)pais[i] = 0;
     nivel = new int[this->nVertices+1]();
     for (int i = 0; i < this->nVertices+1; ++i)nivel[i] = 0;
-    bool visitados[nVertices+1];
+    visitados = new bool[nVertices+1]();
     for (int i = 0; i < this->nVertices+1; ++i)visitados[i] = false;
     stack<int> pilha;
 
